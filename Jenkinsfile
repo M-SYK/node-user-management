@@ -1,39 +1,40 @@
 pipeline {
     agent any
-
+    
     stages {
         stage('Checkout') {
             steps {
-                // Jenkins, GitHub deposundan kodu çekecek
+                // GitHub repository'yi Jenkins'a çek
                 checkout scm
             }
         }
-
+        
         stage('Build') {
             steps {
-                // Projeyi derleme adımları
-                script {
-                    sh 'npm install'
-                }
+                // Uygulama derlemesi (örneğin: npm install, mvn clean install)
+                sh 'npm install'
             }
         }
-
+        
         stage('Test') {
             steps {
-                // Test adımları
-                script {
-                    sh 'npm test'
-                }
+                // Uygulama testleri
+                sh 'npm test'
             }
         }
-
+        
         stage('Deploy') {
             steps {
-                // Uygulamayı istediğiniz bir ortama dağıtma adımları
-                script {
-                    sh 'npm run deploy'
-                }
+                // Uygulamayı Kubernetes üzerine dağıt
+                sh 'kubectl apply -f kubernetes-deployment.yml'
             }
+        }
+    }
+    
+    post {
+        success {
+            // Başarılı bir şekilde tamamlandığında yapılacaklar
+            echo 'Pipeline başarıyla tamamlandı. Uygulama Kubernetes üzerinde çalışıyor.'
         }
     }
 }
