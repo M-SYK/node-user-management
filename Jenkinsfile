@@ -2,31 +2,24 @@ pipeline {
     agent any
     
     stages {
-        stage('Checkout') {
+        stage('Clone repository and build') {
             steps {
-                // GitHub repository'yi Jenkins'a çek
-                checkout scm
+                // Git repository'yi çekmek için
+                git 'https://github.com/M-SYK/node-user-management.git'
+
+                // Projeyi içine gidin ve gerekli bağımlılıkları yüklemek için
+                dir('node-user-management') {
+                    sh 'npm install'
+                }
             }
         }
-        
-        stage('Build') {
+
+        stage('Start Node.js application') {
             steps {
-                // Uygulama derlemesi (örneğin: npm install, mvn clean install)
-                sh 'npm install'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                // Uygulama testleri
-                sh 'npm test'
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                // Uygulamayı Kubernetes üzerine dağıt
-                sh 'kubectl apply -f kubernetes-deployment.yml'
+                // Node.js uygulamasını başlatmak için
+                dir('node-user-management') {
+                    sh 'npm run server'
+                }
             }
         }
     }
